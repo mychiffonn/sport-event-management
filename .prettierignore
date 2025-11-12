@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.git
+.env
+*.log
+coverage
+.next
+.cache
+pnpm-lock.yaml
+package-lock.json

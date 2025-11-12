@@ -1,0 +1,47 @@
+[
+  {
+    "organizer_id": 1,
+    "sport": "Basketball",
+    "location": "Central Park Courts",
+    "date": "2025-12-15",
+    "time": "10:00:00",
+    "capacity": 10,
+    "description": "Casual basketball game, all skill levels welcome!"
+  },
+  {
+    "organizer_id": 2,
+    "sport": "Soccer",
+    "location": "Riverside Field",
+    "date": "2025-12-20",
+    "time": "09:00:00",
+    "capacity": 22,
+    "description": "Friendly soccer match, need more players!"
+  },
+  {
+    "organizer_id": 3,
+    "sport": "Tennis",
+    "location": "City Tennis Center",
+    "date": "2025-12-18",
+    "time": "14:00:00",
+    "capacity": 4,
+    "description": "Looking for doubles partners, intermediate level"
+  },
+  {
+    "organizer_id": 4,
+    "sport": "Volleyball",
+    "location": "Beach Court",
+    "date": "2025-12-22",
+    "time": "18:00:00",
+    "capacity": 12,
+    "description": "Beach volleyball at sunset, bring your energy!"
+  },
+  {
+    "organizer_id": 5,
+    "sport": "Badminton",
+    "location": "Sports Complex",
+    "date": "2025-12-25",
+    "time": "11:00:00",
+    "capacity": 16,
+    "description": "Singles and doubles tournament, prizes for winners!"
+  }
+]
