@@ -1,4 +1,5 @@
 import type { Game } from "../services/api"
+import { Link } from "react-router-dom"
 
 interface GameCardProps {
   game: Game
@@ -65,9 +66,12 @@ export function GameCard({ game }: GameCardProps) {
         </div>
         {/*actions*/}
         <div className="card-actions mt-4 justify-end">
-          <button className="btn btn-primary btn-sm" disabled={isFull}>
+          <Link
+            to={`/games/${game.id}`}
+            className={`btn b nt-primary btn-sm ${isFull ? "btn-disabled" : ""}`}
+          >
             {isFull ? "Full" : "View Details"}
-          </button>
+          </Link>
         </div>
       </div>
     </div>

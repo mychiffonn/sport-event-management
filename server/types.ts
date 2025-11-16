@@ -31,7 +31,7 @@ export interface Game {
   time: string
   max_capacity: number
   current_capacity: number
-  description: string
+  description?: string
   created_at: string
   updated_at: string
 }
@@ -44,7 +44,7 @@ export interface CreateGameInput {
   date: string
   time: string
   max_capacity: number
-  description: string
+  description?: string
 }
 
 export interface UpdateGameInput {
@@ -65,6 +65,8 @@ export interface RSVP {
   status: "confirmed" | "waitlisted" | "rejected"
   created_at: string
   updated_at: string
+  user_name?: string
+  user_email?: string
 }
 
 export interface CreateRSVPInput {
@@ -81,5 +83,6 @@ export interface GameFilters {
   sport_type?: string
   location?: string
   date?: string
+  has_spots?: string | boolean
   organizer_id?: number
 }

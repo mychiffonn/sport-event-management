@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import { pool } from "../config/database.js"
-import type { CreateGameInput, GameFilters, UpdateGameInput } from "../types/types.js"
+import type { CreateGameInput, GameFilters, UpdateGameInput } from "../types.js"
 
 // Get all games with optional filters
 export const getGames = async (req: Request, res: Response): Promise<void> => {
@@ -112,7 +112,7 @@ export const updateGame = async (req: Request, res: Response): Promise<void> => 
 
     // Build dynamic update query
     const updates: string[] = []
-    const params: (string | number)[] = []
+    const params: (string | number | null)[] = []
     let paramCount = 1
 
     if (title !== undefined) {
@@ -153,7 +153,7 @@ export const updateGame = async (req: Request, res: Response): Promise<void> => 
 
     if (description !== undefined) {
       updates.push(`description = $${paramCount}`)
-      params.push(description)
+      params.push(description || null)
       paramCount++
     }
 
