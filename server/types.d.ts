@@ -27,8 +27,8 @@ export interface Game {
   title: string
   sport_type: string
   location: string
-  date: string
-  time: string
+  scheduled_at: string
+  timezone: string
   max_capacity: number
   current_capacity: number
   description?: string
@@ -41,8 +41,8 @@ export interface CreateGameInput {
   title: string
   sport_type: string
   location: string
-  date: string
-  time: string
+  scheduled_at: string
+  timezone: string
   max_capacity: number
   description?: string
 }
@@ -51,8 +51,8 @@ export interface UpdateGameInput {
   title?: string
   sport_type?: string
   location?: string
-  date?: string
-  time?: string
+  scheduled_at?: string
+  timezone?: string
   max_capacity?: number
   description?: string
 }
