@@ -30,15 +30,15 @@ const createTablesQuery = `
     title VARCHAR(255) NOT NULL,
     sport_type VARCHAR(100) NOT NULL,
     location VARCHAR(255) NOT NULL,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
+    scheduled_at TIMESTAMPTZ NOT NULL,
+    timezone VARCHAR(100) NOT NULL,
     max_capacity INTEGER NOT NULL,
     current_capacity INTEGER DEFAULT 0,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT future_date CHECK (date >= CURRENT_DATE),
+    CONSTRAINT future_scheduled_at CHECK (scheduled_at > CURRENT_TIMESTAMP),
     CONSTRAINT max_capacity_minimum CHECK (max_capacity >= 2),
     CONSTRAINT valid_capacity CHECK (current_capacity >= 0 AND current_capacity <= max_capacity)
   );
@@ -57,7 +57,7 @@ const createTablesQuery = `
   );
 
   -- Indexes for performance
-  CREATE INDEX idx_games_date ON games(date);
+  CREATE INDEX idx_games_scheduled_at ON games(scheduled_at);
   CREATE INDEX idx_games_sport_type ON games(sport_type);
   CREATE INDEX idx_games_location ON games(location);
   CREATE INDEX idx_games_organizer ON games(organizer_id);
@@ -94,8 +94,8 @@ interface Game {
   title: string
   sport_type: string
   location: string
-  date: string
-  time: string
+  scheduled_at: string
+  timezone: string
   max_capacity: number
   description: string
 }
@@ -140,15 +140,15 @@ async function seedDatabase(users: User[], games: Game[], rsvps: RSVP[]) {
   // Insert games
   for (const game of games) {
     await pool.query(
-      `INSERT INTO games (organizer_id, title, sport_type, location, date, time, max_capacity, description)
+      `INSERT INTO games (organizer_id, title, sport_type, location, scheduled_at, timezone, max_capacity, description)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
         game.organizer_id,
         game.title,
         game.sport_type,
         game.location,
-        game.date,
-        game.time,
+        game.scheduled_at,
+        game.timezone,
         game.max_capacity,
         game.description
       ]

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { api, type Game } from "../services/api"
+import { api, type Game } from "@/services/api"
 
-export function EditGameForm() {
+function EditGameForm() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [game, setGame] = useState<Game | null>(null)
@@ -296,3 +296,5 @@ export function EditGameForm() {
     </div>
   )
 }
+
+export default EditGameForm

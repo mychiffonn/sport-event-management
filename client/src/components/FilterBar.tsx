@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { SPORT_TYPES } from "@/constants/sports"
 
 interface FilterBarProps {
   onFilterChange: (filters: {
@@ -21,61 +22,67 @@ interface FilterBarProps {
   }
 }
 
-export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
-  const [sportType, setSportType] = useState(initialFilters.sport_type || "")
-  const [location, setLocation] = useState(initialFilters.location || "")
-  const [dateStart, setDateStart] = useState(initialFilters.date_start || "")
-  const [dateEnd, setDateEnd] = useState(initialFilters.date_end || "")
-  const [hasSpots, setHasSpots] = useState(initialFilters.has_spots || false)
-  const [search, setSearch] = useState(initialFilters.search || "")
-  const [sortValue, setSortValue] = useState(initialFilters.sort || "date-asc")
+function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
+  const [filters, setFilters] = useState({
+    sportType: initialFilters.sport_type || "",
+    location: initialFilters.location || "",
+    dateStart: initialFilters.date_start || "",
+    dateEnd: initialFilters.date_end || "",
+    hasSpots: initialFilters.has_spots || false,
+    search: initialFilters.search || "",
+    sortValue: initialFilters.sort || "date-asc"
+  })
 
   useEffect(() => {
-    setSportType(initialFilters.sport_type || "")
-    setLocation(initialFilters.location || "")
-    setDateStart(initialFilters.date_start || "")
-    setDateEnd(initialFilters.date_end || "")
-    setHasSpots(initialFilters.has_spots || false)
-    setSearch(initialFilters.search || "")
-    setSortValue(initialFilters.sort || "date-asc")
+    setFilters({
+      sportType: initialFilters.sport_type || "",
+      location: initialFilters.location || "",
+      dateStart: initialFilters.date_start || "",
+      dateEnd: initialFilters.date_end || "",
+      hasSpots: initialFilters.has_spots || false,
+      search: initialFilters.search || "",
+      sortValue: initialFilters.sort || "date-asc"
+    })
   }, [initialFilters])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (dateStart && dateEnd && dateStart > dateEnd) {
+    if (filters.dateStart && filters.dateEnd && filters.dateStart > filters.dateEnd) {
       alert("Start date cannot be after end date")
       return
     }
 
-    const filters = {
-      sport_type: sportType || undefined,
-      location: location || undefined,
-      date_start: dateStart || undefined,
-      date_end: dateEnd || undefined,
-      has_spots: hasSpots ? true : undefined,
-      search: search || undefined,
-      sort: sortValue
+    const submitFilters = {
+      sport_type: filters.sportType || undefined,
+      location: filters.location || undefined,
+      date_start: filters.dateStart || undefined,
+      date_end: filters.dateEnd || undefined,
+      has_spots: filters.hasSpots ? true : undefined,
+      search: filters.search || undefined,
+      sort: filters.sortValue
     }
 
     // Remove empty values
-    Object.keys(filters).forEach(
+    Object.keys(submitFilters).forEach(
       (key) =>
-        filters[key as keyof typeof filters] === undefined &&
-        delete filters[key as keyof typeof filters]
+        submitFilters[key as keyof typeof submitFilters] === undefined &&
+        delete submitFilters[key as keyof typeof submitFilters]
     )
 
-    onFilterChange(filters)
+    onFilterChange(submitFilters)
   }
 
   const handleReset = () => {
-    setSportType("")
-    setLocation("")
-    setDateStart("")
-    setDateEnd("")
-    setHasSpots(false)
-    setSearch("")
-    setSortValue("date-asc")
+    setFilters({
+      sportType: "",
+      location: "",
+      dateStart: "",
+      dateEnd: "",
+      hasSpots: false,
+      search: "",
+      sortValue: "date-asc"
+    })
 
     // Clear filters
     onFilterChange({})
@@ -83,12 +90,12 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
 
   const getActiveFilterCount = () => {
     let count = 0
-    if (sportType) count++
-    if (location) count++
-    if (dateStart) count++
-    if (dateEnd) count++
-    if (hasSpots) count++
-    if (search) count++
+    if (filters.sportType) count++
+    if (filters.location) count++
+    if (filters.dateStart) count++
+    if (filters.dateEnd) count++
+    if (filters.hasSpots) count++
+    if (filters.search) count++
     // don't count sort as it always has a value (default: date-asc)
     return count
   }
@@ -107,8 +114,8 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
             <input
               type="text"
               name="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               placeholder="Search by title, description, or location..."
               className="input input-bordered w-full"
             />
@@ -122,8 +129,8 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
             <select
               name="sort"
               className="select select-bordered w-full"
-              value={sortValue}
-              onChange={(e) => setSortValue(e.target.value)}
+              value={filters.sortValue}
+              onChange={(e) => setFilters({ ...filters, sortValue: e.target.value })}
             >
               <option value="date-asc">Date (Soonest First)</option>
               <option value="date-desc">Date (Latest First)</option>
@@ -144,18 +151,15 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
               <select
                 name="sport_type"
                 className="select select-bordered w-full"
-                value={sportType}
-                onChange={(e) => setSportType(e.target.value)}
+                value={filters.sportType}
+                onChange={(e) => setFilters({ ...filters, sportType: e.target.value })}
               >
                 <option value="">All Sports</option>
-                <option value="Basketball">Basketball</option>
-                <option value="Soccer">Soccer</option>
-                <option value="Tennis">Tennis</option>
-                <option value="Table Tennis">Table Tennis</option>
-                <option value="Volleyball">Volleyball</option>
-                <option value="Badminton">Badminton</option>
-                <option value="Baseball">Baseball</option>
-                <option value="Football">Football</option>
+                {SPORT_TYPES.map((sport) => (
+                  <option key={sport} value={sport}>
+                    {sport}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -167,8 +171,8 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
               <input
                 type="text"
                 name="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={filters.location}
+                onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                 placeholder="Filter by city..."
                 className="input input-bordered w-full"
               />
@@ -182,9 +186,9 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
               <input
                 type="date"
                 name="date_start"
-                value={dateStart}
-                onChange={(e) => setDateStart(e.target.value)}
-                max={dateEnd || undefined}
+                value={filters.dateStart}
+                onChange={(e) => setFilters({ ...filters, dateStart: e.target.value })}
+                max={filters.dateEnd || undefined}
                 className="input input-bordered w-full"
               />
             </div>
@@ -196,9 +200,9 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
               <input
                 type="date"
                 name="date_end"
-                value={dateEnd}
-                onChange={(e) => setDateEnd(e.target.value)}
-                min={dateStart || undefined}
+                value={filters.dateEnd}
+                onChange={(e) => setFilters({ ...filters, dateEnd: e.target.value })}
+                min={filters.dateStart || undefined}
                 className="input input-bordered w-full"
               />
             </div>
@@ -213,8 +217,8 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
                   <input
                     type="checkbox"
                     name="has_spots"
-                    checked={hasSpots}
-                    onChange={(e) => setHasSpots(e.target.checked)}
+                    checked={filters.hasSpots}
+                    onChange={(e) => setFilters({ ...filters, hasSpots: e.target.checked })}
                     className="checkbox checkbox-primary"
                   />
                   <span className="label-text">Has spots</span>
@@ -246,3 +250,5 @@ export function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProp
     </div>
   )
 }
+
+export default FilterBar

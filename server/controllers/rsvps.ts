@@ -1,9 +1,8 @@
+import { isPast, parseISO } from "date-fns"
 import { Request, Response } from "express"
 
-import { pool } from "../config/database.js"
-import type { CreateRSVPInput, UpdateRSVPInput } from "../types.js"
-
-// import { P } from "node_modules/better-auth/dist/shared/better-auth.BUpnjBGu.js"
+import { pool } from "../config/database"
+import { type CreateRSVPInput, type UpdateRSVPInput } from "../types"
 
 // Get all RSVPs for a game
 export const getRSVPsForGame = async (req: Request, res: Response): Promise<void> => {
@@ -42,7 +41,7 @@ export const createRSVP = async (req: Request, res: Response): Promise<void> => 
     // validation - check if user exists in database
     const userResult = await pool.query("SELECT * FROM users WHERE id = $1", [user_id])
     if (userResult.rows.length === 0) {
-      res.status(404).json({ error: "User not found " })
+      res.status(404).json({ error: "User not found" })
       return
     }
 
@@ -62,25 +61,17 @@ export const createRSVP = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
-    // Check if game date is in the future
-    const gameDate =
-      typeof game.date === "string"
-        ? game.date.split("T")[0]
-        : game.date.toISOString().split("T")[0]
-    const gameDateTime = new Date(`${gameDate}T${game.time}`)
-    const now = new Date()
+    // Check if game is in the past
+    const scheduledAt = parseISO(game.scheduled_at)
 
-    // debug
-    console.log("Game datetime:", gameDateTime)
-    console.log("Current time:", now)
-    console.log("Is past?", gameDateTime <= now)
-
-    if (gameDateTime <= now) {
-      const [year, month, day] = gameDate.split("-")
-      const formattedDate = `${month}/${day}/${year}`
+    if (isPast(scheduledAt)) {
+      const formattedDate = scheduledAt.toLocaleDateString("en-US")
+      const formattedTime = scheduledAt.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      })
       res.status(400).json({
-        error: `This game was scheduled for ${formattedDate} at ${game.time} and has already begun or passed.
-        `
+        error: `This game was scheduled for ${formattedDate} at ${formattedTime} and has already begun or passed.`
       })
       return
     }
@@ -96,21 +87,32 @@ export const createRSVP = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
-    // Create RSVP
-    // update: uses user_id instead now
-    const rsvpResult = await pool.query(
-      `INSERT INTO rsvps (game_id, user_id, status)
-       VALUES ($1, $2, 'confirmed')
-       RETURNING *`,
-      [gameId, user_id]
-    )
+    // Use transaction to ensure RSVP creation and capacity update happen atomically
+    const client = await pool.connect()
+    try {
+      await client.query("BEGIN")
 
-    // Update game current_capacity
-    await pool.query("UPDATE games SET current_capacity = current_capacity + 1 WHERE id = $1", [
-      gameId
-    ])
+      // Create RSVP
+      const rsvpResult = await client.query(
+        `INSERT INTO rsvps (game_id, user_id, status)
+         VALUES ($1, $2, 'confirmed')
+         RETURNING *`,
+        [gameId, user_id]
+      )
 
-    res.status(201).json(rsvpResult.rows[0])
+      // Update game current_capacity
+      await client.query("UPDATE games SET current_capacity = current_capacity + 1 WHERE id = $1", [
+        gameId
+      ])
+
+      await client.query("COMMIT")
+      res.status(201).json(rsvpResult.rows[0])
+    } catch (txError) {
+      await client.query("ROLLBACK")
+      throw txError
+    } finally {
+      client.release()
+    }
   } catch (error) {
     console.error("Error creating RSVP:", error)
     res.status(500).json({ error: "Failed to create RSVP" })

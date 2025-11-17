@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { api } from "../services/api"
+import { api } from "@/services/api"
+import { getUserTimezone } from "@/utils/format-date"
+import { SPORT_TYPES } from "@/constants/sports"
 
 export function CreateGameForm() {
   const navigate = useNavigate()
@@ -15,24 +17,25 @@ export function CreateGameForm() {
     const dateStr = formData.get("date") as string
     const timeStr = formData.get("time") as string
 
-    const localDateTime = new Date(`${dateStr}T${timeStr}`)
+    // Get user's timezone
+    const timezone = getUserTimezone()
 
     // Validate date is in the future (using local time)
+    const localDateTime = new Date(`${dateStr}T${timeStr}`)
     if (localDateTime <= new Date()) {
       setError("Game date and time must be in the future")
       return
     }
 
-    // Convert to UTC for storage
-    const utcDate = localDateTime.toISOString().split("T")[0] // YYYY-MM-DD in UTC
-    const utcTime = localDateTime.toISOString().split("T")[1].slice(0, 8) // HH:MM:SS in UTC
+    // Combine date and time into ISO timestamp format
+    const scheduled_at = `${dateStr}T${timeStr}:00`
 
     const newGame = {
       title: formData.get("title") as string,
       sport_type: formData.get("sport_type") as string,
       location: formData.get("location") as string,
-      date: utcDate, // UTC date
-      time: utcTime, // UTC time
+      scheduled_at: scheduled_at, // ISO timestamp
+      timezone: timezone, // User's timezone for display
       max_capacity: Number(formData.get("max_capacity")),
       description: (formData.get("description") as string) || undefined,
       organizer_id: 1 // TODO: Replace with actual user ID from auth context
@@ -43,8 +46,8 @@ export function CreateGameForm() {
       !newGame.title ||
       !newGame.sport_type ||
       !newGame.location ||
-      !newGame.date ||
-      !newGame.time ||
+      !newGame.scheduled_at ||
+      !newGame.timezone ||
       !newGame.max_capacity
     ) {
       setError("Please fill in all required fields")
@@ -103,14 +106,11 @@ export function CreateGameForm() {
             </label>
             <select name="sport_type" className="select select-bordered w-full" required>
               <option value="">Select a sport</option>
-              <option value="Basketball">Basketball</option>
-              <option value="Soccer">Soccer</option>
-              <option value="Tennis">Tennis</option>
-              <option value="Table Tennis">Table Tennis</option>
-              <option value="Volleyball">Volleyball</option>
-              <option value="Badminton">Badminton</option>
-              <option value="Baseball">Baseball</option>
-              <option value="Football">Football</option>
+              {SPORT_TYPES.map((sport) => (
+                <option key={sport} value={sport}>
+                  {sport}
+                </option>
+              ))}
               <option value="Other">Other</option>
             </select>
           </div>
@@ -200,3 +200,5 @@ export function CreateGameForm() {
     </div>
   )
 }
+
+export default CreateGameForm

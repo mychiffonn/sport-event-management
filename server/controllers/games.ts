@@ -37,13 +37,13 @@ export const getGames = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (date_start) {
-      query += ` AND date >= $${paramCount}`
+      query += ` AND scheduled_at >= $${paramCount}`
       params.push(date_start)
       paramCount++
     }
 
     if (date_end) {
-      query += ` AND date <= $${paramCount}`
+      query += ` AND scheduled_at <= $${paramCount}`
       params.push(date_end)
       paramCount++
     }
@@ -52,12 +52,12 @@ export const getGames = async (req: Request, res: Response): Promise<void> => {
       query += " AND current_capacity < max_capacity"
     }
 
-    let orderBy = " ORDER BY date ASC, time ASC"
+    let orderBy = " ORDER BY scheduled_at ASC"
 
     if (sort === "date-asc") {
-      orderBy = "ORDER BY date ASC, time ASC"
+      orderBy = "ORDER BY scheduled_at ASC"
     } else if (sort === "date-desc") {
-      orderBy = "ORDER BY date DESC, time DESC"
+      orderBy = "ORDER BY scheduled_at DESC"
     } else if (sort === "spots-desc") {
       orderBy = "ORDER BY (max_capacity - current_capacity) DESC"
     } else if (sort === "spots-asc") {
@@ -103,31 +103,24 @@ export const createGame = async (req: Request, res: Response): Promise<void> => 
       title,
       sport_type,
       location,
-      date,
-      time,
+      scheduled_at,
+      timezone,
       max_capacity,
       description,
       organizer_id
     }: CreateGameInput = req.body
 
     // Validate required fields
-    if (!title || !sport_type || !location || !date || !time || !max_capacity) {
+    if (!title || !sport_type || !location || !scheduled_at || !timezone || !max_capacity) {
       res.status(400).json({ error: "Missing required fields" })
       return
     }
 
-    // Validate date is in the future
-    const gameDate = new Date(`${date}T${time}`)
-    if (gameDate <= new Date()) {
-      res.status(400).json({ error: "Game date must be in the future" })
-      return
-    }
-
     const result = await pool.query(
-      `INSERT INTO games (title, sport_type, location, date, time, max_capacity, current_capacity, description, organizer_id)
-       VALUES ($1, $2, $3, $4, $5, $6, 0, $7, $8)
+      `INSERT INTO games (title, sport_type, location, scheduled_at, timezone, max_capacity, current_capacity, description, organizer_id)
+       VALUES ($1, $2, $3, $4 AT TIME ZONE $5, $5, $6, 0, $7, $8)
        RETURNING *`,
-      [title, sport_type, location, date, time, max_capacity, description, organizer_id]
+      [title, sport_type, location, scheduled_at, timezone, max_capacity, description, organizer_id]
     )
 
     res.status(201).json(result.rows[0])
@@ -141,8 +134,15 @@ export const createGame = async (req: Request, res: Response): Promise<void> => 
 export const updateGame = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params
-    const { title, sport_type, location, date, time, max_capacity, description }: UpdateGameInput =
-      req.body
+    const {
+      title,
+      sport_type,
+      location,
+      scheduled_at,
+      timezone,
+      max_capacity,
+      description
+    }: UpdateGameInput = req.body
 
     // Build dynamic update query
     const updates: string[] = []
@@ -167,15 +167,20 @@ export const updateGame = async (req: Request, res: Response): Promise<void> => 
       paramCount++
     }
 
-    if (date !== undefined) {
-      updates.push(`date = $${paramCount}`)
-      params.push(date)
+    if (scheduled_at !== undefined && timezone !== undefined) {
+      updates.push(`scheduled_at = $${paramCount} AT TIME ZONE $${paramCount + 1}`)
+      params.push(scheduled_at, timezone)
+      paramCount += 2
+      updates.push(`timezone = $${paramCount}`)
+      params.push(timezone)
       paramCount++
-    }
-
-    if (time !== undefined) {
-      updates.push(`time = $${paramCount}`)
-      params.push(time)
+    } else if (scheduled_at !== undefined) {
+      updates.push(`scheduled_at = $${paramCount}`)
+      params.push(scheduled_at)
+      paramCount++
+    } else if (timezone !== undefined) {
+      updates.push(`timezone = $${paramCount}`)
+      params.push(timezone)
       paramCount++
     }
 
@@ -219,10 +224,7 @@ export const deleteGame = async (req: Request, res: Response): Promise<void> => 
   try {
     const { id } = req.params
 
-    // First delete all RSVPs for this game
-    await pool.query("DELETE FROM rsvps WHERE game_id = $1", [id])
-
-    // Then delete the game
+    // Delete the game (RSVPs will be automatically deleted via ON DELETE CASCADE)
     const result = await pool.query("DELETE FROM games WHERE id = $1 RETURNING *", [id])
 
     if (result.rows.length === 0) {
@@ -244,15 +246,15 @@ export const getUserHostedGames = async (req: Request, res: Response): Promise<v
     const result = await pool.query(
       `SELECT * FROM games
        WHERE organizer_id = $1
-       AND (date || ' ' || time)::timestamp > NOW()
-       ORDER BY date ASC, time ASC`,
+       AND scheduled_at > NOW()
+       ORDER BY scheduled_at ASC`,
       [userId]
     )
 
     res.status(200).json(result.rows)
   } catch (error) {
     console.error("Error fetching user's hosted games:", error)
-    res.status(500).json({ error: "Failed to fetch hosted games " })
+    res.status(500).json({ error: "Failed to fetch hosted games" })
   }
 }
 
@@ -265,8 +267,8 @@ export const getUserRSVPGames = async (req: Request, res: Response): Promise<voi
        FROM games g
        JOIN rsvps r ON g.id = r.game_id
        WHERE r.user_id = $1
-       AND (g.date || ' ' || g.time)::timestamp > NOW()
-       ORDER BY g.date ASC, g.time ASC`,
+       AND g.scheduled_at > NOW()
+       ORDER BY g.scheduled_at ASC`,
       [userId]
     )
 
@@ -285,9 +287,9 @@ export const getUserPastGames = async (req: Request, res: Response): Promise<voi
       `SELECT g.*, r.id as rsvp_id, r.status as rsvp_status
        FROM games g
        JOIN rsvps r ON g.id = r.game_id
-       WHERE r.user_id = $1 
-       AND (g.date || ' ' || g.time)::timestamp <= NOW()
-       ORDER BY g.date DESC, g.time DESC`,
+       WHERE r.user_id = $1
+       AND g.scheduled_at <= NOW()
+       ORDER BY g.scheduled_at DESC`,
       [userId]
     )
 
@@ -304,9 +306,9 @@ export const getUserPastHostedGames = async (req: Request, res: Response): Promi
 
     const result = await pool.query(
       `SELECT * FROM games
-       WHERE organizer_id = $1 
-       AND (date || ' ' || time)::timestamp <= NOW()
-       ORDER BY date DESC, time DESC`,
+       WHERE organizer_id = $1
+       AND scheduled_at <= NOW()
+       ORDER BY scheduled_at DESC`,
       [userId]
     )
 
