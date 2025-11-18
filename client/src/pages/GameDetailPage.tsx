@@ -28,9 +28,8 @@ function GameDetailPage() {
         setGame(gameData)
         setRsvps(rsvpData)
         setError(null)
-      } catch (err) {
+      } catch {
         setError("Failed to load game details")
-        console.error("Error fetching game details:", err)
       } finally {
         setLoading(false)
       }
@@ -49,9 +48,8 @@ function GameDetailPage() {
       await api.deleteGame(gameId)
       // Redirect to games list after deletion
       navigate("/games")
-    } catch (err) {
+    } catch {
       alert("Failed to delete game. Please try again.")
-      console.error("Error deleting game:", err)
     }
   }
 
@@ -109,10 +107,6 @@ function GameDetailPage() {
 
   const spotsRemaining = game.max_capacity - game.current_capacity
   const isFull = spotsRemaining === 0
-
-  console.log("Game organizer_id:", game.organizer_id)
-  console.log("Current user id:", 1)
-  console.log("Is organizer?", game.organizer_id === 1)
 
   return (
     <PageTransition>

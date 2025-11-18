@@ -8,6 +8,7 @@ import HomePage from "@/pages/HomePage"
 import MyEventsPage from "@/pages/MyEventsPage"
 import NotFoundPage from "@/pages/NotFoundPage"
 import ProfilePage from "@/pages/ProfilePage"
+import UserProfilePage from "@/pages/UserProfilePage"
 import Layout from "@/layouts/Layout"
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/games/new/" element={<CreateGamePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-events" element={<MyEventsPage />} />
+          <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="*" element={<NotFoundPage />} /> {/*caches all unmatched routes*/}
         </Routes>
       </Layout>

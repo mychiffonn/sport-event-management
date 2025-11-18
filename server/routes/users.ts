@@ -1,6 +1,7 @@
 import express from "express"
 
 import {
+  getUserById,
   getUserHostedGames,
   getUserPastGames,
   getUserPastHostedGames,
@@ -9,6 +10,7 @@ import {
 
 const router: express.Router = express.Router()
 
+router.get("/:userId", getUserById)
 router.get("/:userId/hosted", getUserHostedGames)
 router.get("/:userId/rsvps", getUserRSVPGames)
 router.get("/:userId/past", getUserPastGames)

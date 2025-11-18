@@ -110,6 +110,14 @@ export const api = {
     if (!response.ok) throw new Error("Failed to delete RSVP")
   },
 
+  async getUser(
+    userId: number
+  ): Promise<{ id: number; name: string; email: string; created_at: string }> {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}`)
+    if (!response.ok) throw new Error("Failed to fetch user")
+    return response.json()
+  },
+
   async getUserHostedGames(userId: number): Promise<Game[]> {
     const response = await fetch(`${API_BASE_URL}/users/${userId}/hosted`)
     if (!response.ok) throw new Error("Failed to fetch hosted games")

@@ -2,6 +2,26 @@ import { Request, Response } from "express"
 
 import pool from "../config/database.js"
 
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params
+
+    const result = await pool.query(`SELECT id, name, email, created_at FROM users WHERE id = $1`, [
+      userId
+    ])
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: "User not found" })
+      return
+    }
+
+    res.status(200).json(result.rows[0])
+  } catch (error) {
+    console.error("Error fetching user:", error)
+    res.status(500).json({ error: "Failed to fetch user" })
+  }
+}
+
 export const getUserHostedGames = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.params

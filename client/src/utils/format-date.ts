@@ -7,7 +7,7 @@ import { format, parseISO } from "date-fns"
  * @param timezone - IANA timezone string (e.g., 'America/New_York')
  * @returns Formatted date string
  */
-export const formatLongDate = (timestamp: string, timezone: string): string => {
+export const formatLongDate = (timestamp: string, timezone: string = "UTC"): string => {
   const date = parseISO(timestamp)
   const tzDate = new TZDate(date, timezone)
   return format(tzDate, "EEEE, MMMM d, yyyy")
