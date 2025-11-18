@@ -9,6 +9,7 @@ import "./config/dotenv.js"
 import { pool } from "./config/database.js"
 import gamesRouter from "./routes/games.js"
 import rsvpsRouter from "./routes/rsvps.js"
+import userRouter from "./routes/users.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -29,6 +30,7 @@ app.use(express.json())
 
 // API routes
 app.use("/api/games", gamesRouter)
+app.use("/api/users", userRouter)
 app.use("/api", rsvpsRouter)
 
 // Health check

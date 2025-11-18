@@ -15,16 +15,14 @@ import {
 const router: express.Router = express.Router()
 
 router.get("/", getGames)
+router.get("/:id", getGame)
+router.post("/", createGame)
+router.patch("/:id", updateGame)
+router.delete("/:id", deleteGame)
 
 router.get("/user/:userId/hosted", getUserHostedGames)
 router.get("/user/:userId/rsvps", getUserRSVPGames)
 router.get("/user/:userId/past", getUserPastGames)
 router.get("/user/:userId/past-hosted", getUserPastHostedGames)
-
-router.get("/:id", getGame)
-
-router.post("/", createGame)
-router.patch("/:id", updateGame)
-router.delete("/:id", deleteGame)
 
 export default router
