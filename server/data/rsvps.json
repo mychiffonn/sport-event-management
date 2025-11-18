@@ -1,62 +1,67 @@
 [
   {
     "game_id": 1,
-    "user_id": 2,
+    "user_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
     "status": "going"
   },
   {
     "game_id": 1,
-    "user_id": 3,
+    "user_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
     "status": "maybe"
   },
   {
-    "game_id": 1,
-    "user_id": 4,
+    "game_id": 2,
+    "user_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
     "status": "going"
   },
   {
     "game_id": 2,
-    "user_id": 1,
-    "status": "going"
-  },
-  {
-    "game_id": 2,
-    "user_id": 3,
-    "status": "going"
-  },
-  {
-    "game_id": 2,
-    "user_id": 5,
-    "status": "maybe"
-  },
-  {
-    "game_id": 3,
-    "user_id": 1,
+    "user_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
     "status": "going"
   },
   {
     "game_id": 3,
-    "user_id": 2,
-    "status": "not_going"
+    "user_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
+    "status": "going"
   },
   {
-    "game_id": 4,
-    "user_id": 2,
+    "game_id": 3,
+    "user_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
+    "status": "going"
+  },
+  {
+    "game_id": 3,
+    "user_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
     "status": "going"
   },
   {
     "game_id": 4,
-    "user_id": 4,
+    "user_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
+    "status": "going"
+  },
+  {
+    "game_id": 4,
+    "user_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
     "status": "maybe"
   },
   {
     "game_id": 5,
-    "user_id": 1,
+    "user_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
     "status": "going"
   },
   {
-    "game_id": 5,
-    "user_id": 3,
+    "game_id": 6,
+    "user_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
     "status": "going"
+  },
+  {
+    "game_id": 6,
+    "user_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
+    "status": "going"
+  },
+  {
+    "game_id": 7,
+    "user_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
+    "status": "maybe"
   }
 ]

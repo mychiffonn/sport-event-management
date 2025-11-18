@@ -75,7 +75,7 @@ export const api = {
   },
 
   // create an RSVP
-  async createRSVP(gameId: number, userId: number): Promise<RSVP> {
+  async createRSVP(gameId: number, userId: string): Promise<RSVP> {
     const response = await fetch(`${API_BASE_URL}/games/${gameId}/rsvps`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -111,20 +111,20 @@ export const api = {
   },
 
   async getUser(
-    userId: number
-  ): Promise<{ id: number; name: string; email: string; created_at: string }> {
+    userId: string
+  ): Promise<{ id: string; name: string; email: string; created_at: string }> {
     const response = await fetch(`${API_BASE_URL}/users/${userId}`)
     if (!response.ok) throw new Error("Failed to fetch user")
     return response.json()
   },
 
-  async getUserHostedGames(userId: number): Promise<Game[]> {
+  async getUserHostedGames(userId: string): Promise<Game[]> {
     const response = await fetch(`${API_BASE_URL}/users/${userId}/hosted`)
     if (!response.ok) throw new Error("Failed to fetch hosted games")
     return response.json()
   },
 
-  async getUserRSVPGames(userId: number): Promise<Game[]> {
+  async getUserRSVPGames(userId: string): Promise<Game[]> {
     const response = await fetch(`${API_BASE_URL}/users/${userId}/rsvps`)
     if (!response.ok) throw new Error("Failed to fetch RSVP'd games")
     return response.json()

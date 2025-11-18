@@ -12,7 +12,7 @@ export const getRSVPsForGame = async (req: Request, res: Response): Promise<void
     const result = await pool.query(
       `SELECT r.*, u.name as user_name, u.email as user_email
        FROM rsvps r
-       JOIN users u ON r.user_id = u.id
+       JOIN "user" u ON r.user_id = u.id
        WHERE r.game_id = $1
        ORDER BY r.created_at ASC`,
       [gameId]
@@ -39,7 +39,7 @@ export const createRSVP = async (req: Request, res: Response): Promise<void> => 
     }
 
     // validation - check if user exists in database
-    const userResult = await pool.query("SELECT * FROM users WHERE id = $1", [user_id])
+    const userResult = await pool.query('SELECT * FROM "user" WHERE id = $1', [user_id])
     if (userResult.rows.length === 0) {
       res.status(404).json({ error: "User not found" })
       return
@@ -109,7 +109,7 @@ export const createRSVP = async (req: Request, res: Response): Promise<void> => 
       const rsvpWithUser = await client.query(
         `SELECT r.*, u.name as user_name, u.email as user_email
          FROM rsvps r
-         JOIN users u ON r.user_id = u.id
+         JOIN "user" u ON r.user_id = u.id
          WHERE r.id = $1`,
         [rsvpResult.rows[0].id]
       )
@@ -151,6 +151,28 @@ export const updateRSVP = async (req: Request, res: Response): Promise<void> => 
     const oldStatus = currentRSVP.rows[0].status
     const gameId = currentRSVP.rows[0].game_id
 
+    // Check if game is in the past
+    const gameResult = await pool.query("SELECT * FROM games WHERE id = $1", [gameId])
+    if (gameResult.rows.length === 0) {
+      res.status(404).json({ error: "Game not found" })
+      return
+    }
+
+    const game = gameResult.rows[0]
+    const scheduledAt = new Date(game.scheduled_at)
+
+    if (isPast(scheduledAt)) {
+      const formattedDate = scheduledAt.toLocaleDateString("en-US")
+      const formattedTime = scheduledAt.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      })
+      res.status(400).json({
+        error: `Cannot modify RSVP for a past event. This game was scheduled for ${formattedDate} at ${formattedTime}.`
+      })
+      return
+    }
+
     // If status hasn't changed, just return the current RSVP
     if (oldStatus === status) {
       res.status(200).json(currentRSVP.rows[0])
@@ -168,9 +190,6 @@ export const updateRSVP = async (req: Request, res: Response): Promise<void> => 
 
       // If changing to 'going', check if game has capacity
       if (!oldIsGoing && newIsGoing) {
-        const gameResult = await client.query("SELECT * FROM games WHERE id = $1", [gameId])
-        const game = gameResult.rows[0]
-
         if (game.current_capacity >= game.max_capacity) {
           await client.query("ROLLBACK")
           res.status(400).json({ error: "Game is full" })
@@ -202,7 +221,7 @@ export const updateRSVP = async (req: Request, res: Response): Promise<void> => 
       const rsvpWithUser = await client.query(
         `SELECT r.*, u.name as user_name, u.email as user_email
          FROM rsvps r
-         JOIN users u ON r.user_id = u.id
+         JOIN "user" u ON r.user_id = u.id
          WHERE r.id = $1`,
         [id]
       )
@@ -236,6 +255,28 @@ export const deleteRSVP = async (req: Request, res: Response): Promise<void> => 
     }
 
     const rsvp = rsvpResult.rows[0]
+
+    // Check if game is in the past
+    const gameResult = await pool.query("SELECT * FROM games WHERE id = $1", [rsvp.game_id])
+    if (gameResult.rows.length === 0) {
+      res.status(404).json({ error: "Game not found" })
+      return
+    }
+
+    const game = gameResult.rows[0]
+    const scheduledAt = new Date(game.scheduled_at)
+
+    if (isPast(scheduledAt)) {
+      const formattedDate = scheduledAt.toLocaleDateString("en-US")
+      const formattedTime = scheduledAt.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      })
+      res.status(400).json({
+        error: `Cannot cancel RSVP for a past event. This game was scheduled for ${formattedDate} at ${formattedTime}.`
+      })
+      return
+    }
 
     // Delete RSVP
     await pool.query("DELETE FROM rsvps WHERE id = $1", [id])

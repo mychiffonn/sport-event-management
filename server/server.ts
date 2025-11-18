@@ -7,6 +7,7 @@ import express from "express"
 import "./config/dotenv.js"
 
 import { pool } from "./config/database.js"
+import { auth } from "./lib/auth.js"
 import gamesRouter from "./routes/games.js"
 import rsvpsRouter from "./routes/rsvps.js"
 import userRouter from "./routes/users.js"
@@ -29,6 +30,22 @@ app.use(cors(corsOptions))
 app.use(express.json())
 
 // API routes
+app.all("/api/auth/*", async (req, res) => {
+  const response = await auth.handler(
+    new Request(`${req.protocol}://${req.get("host")}${req.url}`, {
+      method: req.method,
+      headers: req.headers as HeadersInit,
+      body: req.method !== "GET" && req.method !== "HEAD" ? JSON.stringify(req.body) : undefined
+    })
+  )
+
+  response.headers.forEach((value, key) => {
+    res.setHeader(key, value)
+  })
+
+  res.status(response.status)
+  res.send(await response.text())
+})
 app.use("/api/games", gamesRouter)
 app.use("/api/users", userRouter)
 app.use("/api", rsvpsRouter)

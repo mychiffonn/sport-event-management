@@ -1,27 +1,6 @@
-export interface User {
-  id: number
-  email: string
-  name: string
-  password_hash: string
-  created_at: string
-  updated_at: string
-}
-
-export interface CreateUserInput {
-  email: string
-  name: string
-  password_hash: string
-}
-
-export interface UpdateUserInput {
-  email?: string
-  name?: string
-  password_hash?: string
-}
-
 export interface Game {
   id: number
-  organizer_id: number
+  organizer_id: string
   title: string
   sport_type: string
   location: string
@@ -35,7 +14,7 @@ export interface Game {
 }
 
 export interface CreateGameInput {
-  organizer_id: number
+  organizer_id: string
   title: string
   sport_type: string
   location: string
@@ -61,7 +40,7 @@ export type RSVPStatus = "going" | "maybe" | "not_going"
 export interface RSVP {
   id: number
   game_id: number
-  user_id: number
+  user_id: string
   status: RSVPStatus
   created_at: string
   updated_at: string
@@ -70,7 +49,7 @@ export interface RSVP {
 
 export interface CreateRSVPInput {
   game_id: number
-  user_id: number
+  user_id: string
 }
 
 export interface UpdateRSVPInput {
@@ -86,5 +65,5 @@ export interface GameFilters {
   has_spots?: string | boolean
   search?: string
   sort?: string
-  organizer_id?: number
+  organizer_id?: string
 }

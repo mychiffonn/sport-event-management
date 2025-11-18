@@ -2,32 +2,23 @@ import { readFile } from "fs/promises"
 import path from "path"
 import { fileURLToPath } from "url"
 
-import type { Game, RSVP, User } from "../types.js"
+import type { Game, RSVP } from "../types.js"
 import { pool } from "./database.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __data_dir = path.join(path.dirname(__filename), "../data")
 
-// Database schema
+// Database schema - matches better-auth requirements
+// Note: better-auth manages the 'user' table, we only manage games and rsvps
 const createTablesQuery = `
-  DROP TABLE IF EXISTS rsvps;
-  DROP TABLE IF EXISTS games;
-  DROP TABLE IF EXISTS users;
+  -- Drop our tables only (not better-auth's user table)
+  DROP TABLE IF EXISTS rsvps CASCADE;
+  DROP TABLE IF EXISTS games CASCADE;
 
-  -- Users Table
-  CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-
-  -- Games Table
+  -- Games Table with string user IDs
   CREATE TABLE games (
     id SERIAL PRIMARY KEY,
-    organizer_id INTEGER NOT NULL,
+    organizer_id VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     sport_type VARCHAR(100) NOT NULL,
     location VARCHAR(255) NOT NULL,
@@ -38,22 +29,21 @@ const createTablesQuery = `
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT future_scheduled_at CHECK (scheduled_at > CURRENT_TIMESTAMP),
+    FOREIGN KEY (organizer_id) REFERENCES "user"(id) ON DELETE CASCADE,
     CONSTRAINT max_capacity_minimum CHECK (max_capacity >= 2),
     CONSTRAINT valid_capacity CHECK (current_capacity >= 0 AND current_capacity <= max_capacity)
   );
 
-  -- RSVPs Table (Junction Table)
+  -- RSVPs Table with string user IDs
   CREATE TABLE rsvps (
     id SERIAL PRIMARY KEY,
     game_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
     status VARCHAR(20) DEFAULT 'going' CHECK (status IN ('going', 'maybe', 'not_going')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE,
     UNIQUE(game_id, user_id)
   );
 
@@ -74,9 +64,6 @@ const createTablesQuery = `
   END;
   $$ language 'plpgsql';
 
-  CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
-      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
   CREATE TRIGGER update_games_updated_at BEFORE UPDATE ON games
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -86,16 +73,13 @@ const createTablesQuery = `
 
 async function loadSeedData() {
   try {
-    const usersPath = path.join(__data_dir, "users.json")
     const gamesPath = path.join(__data_dir, "games.json")
     const rsvpsPath = path.join(__data_dir, "rsvps.json")
 
-    const usersData = await readFile(usersPath, "utf-8")
     const gamesData = await readFile(gamesPath, "utf-8")
     const rsvpsData = await readFile(rsvpsPath, "utf-8")
 
     return {
-      users: JSON.parse(usersData) as User[],
       games: JSON.parse(gamesData) as Game[],
       rsvps: JSON.parse(rsvpsData) as RSVP[]
     }
@@ -105,19 +89,23 @@ async function loadSeedData() {
   }
 }
 
-async function seedDatabase(users: User[], games: Game[], rsvps: RSVP[]) {
-  // Insert users
-  for (const user of users) {
-    await pool.query(
-      `INSERT INTO users (email, name, password_hash)
-       VALUES ($1, $2, $3)`,
-      [user.email, user.name, user.password_hash]
-    )
-  }
-  console.log(`✅ Inserted ${users.length} users`)
+async function seedDatabase(games: Game[], rsvps: RSVP[]) {
+  // Get existing users from better-auth to validate organizer IDs
+  const usersResult = await pool.query(`SELECT id FROM "user"`)
+  const existingUserIds = new Set(usersResult.rows.map((row) => row.id))
 
-  // Insert games
+  console.log(`📋 Found ${existingUserIds.size} existing users in the database`)
+
+  // Insert games (only if organizer exists)
+  let insertedGames = 0
   for (const game of games) {
+    if (!existingUserIds.has(game.organizer_id)) {
+      console.log(
+        `⚠️  Skipping game "${game.title}" - organizer ID "${game.organizer_id}" not found`
+      )
+      continue
+    }
+
     await pool.query(
       `INSERT INTO games (organizer_id, title, sport_type, location, scheduled_at, timezone, max_capacity, description)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
@@ -132,18 +120,26 @@ async function seedDatabase(users: User[], games: Game[], rsvps: RSVP[]) {
         game.description
       ]
     )
+    insertedGames++
   }
-  console.log(`✅ Inserted ${games.length} games`)
+  console.log(`✅ Inserted ${insertedGames} games (${games.length - insertedGames} skipped)`)
 
-  // Insert RSVPs
+  // Insert RSVPs (only if user exists)
+  let insertedRsvps = 0
   for (const rsvp of rsvps) {
+    if (!existingUserIds.has(rsvp.user_id)) {
+      console.log(`⚠️  Skipping RSVP - user ID "${rsvp.user_id}" not found`)
+      continue
+    }
+
     await pool.query(
       `INSERT INTO rsvps (game_id, user_id, status)
        VALUES ($1, $2, $3)`,
       [rsvp.game_id, rsvp.user_id, rsvp.status || "going"]
     )
+    insertedRsvps++
   }
-  console.log(`✅ Inserted ${rsvps.length} RSVPs`)
+  console.log(`✅ Inserted ${insertedRsvps} RSVPs (${rsvps.length - insertedRsvps} skipped)`)
 
   // Update game capacities based on 'going' RSVPs
   await pool.query(`
@@ -166,10 +162,11 @@ async function reset() {
     console.log("✅ Tables created successfully")
 
     console.log("📖 Loading seed data...")
-    const { users, games, rsvps } = await loadSeedData()
+    const { games, rsvps } = await loadSeedData()
 
     console.log("🌱 Seeding database...")
-    await seedDatabase(users, games, rsvps)
+    console.log("ℹ️  Note: Users are managed by better-auth. Create test users via sign-up.")
+    await seedDatabase(games, rsvps)
     console.log("✅ Database seeded successfully")
 
     await pool.end()
