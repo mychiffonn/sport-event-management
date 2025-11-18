@@ -1,12 +1,14 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { SPORT_TYPES } from "@/constants/sports"
+import { useAuth } from "@/contexts/AuthContext"
 import { getUserTimezone } from "@/utils/format-date"
 
 import { api } from "@/services/api"
 
 export function CreateGameForm() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,7 +41,7 @@ export function CreateGameForm() {
       timezone: timezone, // User's timezone for display
       max_capacity: Number(formData.get("max_capacity")),
       description: (formData.get("description") as string) || undefined,
-      organizer_id: 1 // TODO: Replace with actual user ID from auth context
+      organizer_id: user?.id || ""
     }
 
     // Validate required fields

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 
 interface AvatarProps {
-  userId: number
+  userId: string
   userName?: string
   borderColor?: string
   size?: "sm" | "md" | "lg"
