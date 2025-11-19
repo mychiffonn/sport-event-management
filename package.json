@@ -18,7 +18,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@date-fns/tz": "github:date-fns/tz",
+    "@date-fns/tz": "^1.4.1",
     "@tailwindcss/vite": "^4.1.17",
     "better-auth": "^1.3.34",
     "cors": "^2.8.5",
