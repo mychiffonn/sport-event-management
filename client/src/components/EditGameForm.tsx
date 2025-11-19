@@ -166,7 +166,7 @@ function EditGameForm() {
               name="title"
               defaultValue={game.title}
               placeholder="e.g., Friday Night Basketball"
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
           </div>
@@ -179,7 +179,7 @@ function EditGameForm() {
             <select
               name="sport_type"
               defaultValue={game.sport_type}
-              className="select select-bordered w-full"
+              className="select w-full rounded-md"
               required
             >
               <option value="">Select a sport</option>
@@ -202,7 +202,7 @@ function EditGameForm() {
               name="location"
               defaultValue={game.location}
               placeholder="e.g., Central Park Courts"
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
           </div>
@@ -216,7 +216,7 @@ function EditGameForm() {
                 type="date"
                 name="date"
                 defaultValue={localDate}
-                className="input input-bordered w-full"
+                className="input w-full rounded-md"
                 required
               />
             </div>
@@ -229,7 +229,7 @@ function EditGameForm() {
                 type="time"
                 name="time"
                 defaultValue={localTime}
-                className="input input-bordered w-full"
+                className="input w-full rounded-md"
                 required
               />
             </div>
@@ -246,7 +246,7 @@ function EditGameForm() {
               defaultValue={game.max_capacity}
               placeholder="e.g., 10"
               min={game.current_capacity}
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
             <label className="label">
@@ -265,7 +265,7 @@ function EditGameForm() {
               name="description"
               defaultValue={game.description || ""}
               placeholder="Add any additional details about the game..."
-              className="textarea textarea-bordered h-24"
+              className="textarea h-24 rounded-md"
               rows={4}
             />
           </div>

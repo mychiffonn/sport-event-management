@@ -1,12 +1,14 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { SPORT_TYPES } from "@/constants/sports"
+import { useAuth } from "@/contexts/AuthContext"
 import { getUserTimezone } from "@/utils/format-date"
 
 import { api } from "@/services/api"
 
 export function CreateGameForm() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,7 +41,7 @@ export function CreateGameForm() {
       timezone: timezone, // User's timezone for display
       max_capacity: Number(formData.get("max_capacity")),
       description: (formData.get("description") as string) || undefined,
-      organizer_id: 1 // TODO: Replace with actual user ID from auth context
+      organizer_id: user?.id || ""
     }
 
     // Validate required fields
@@ -95,7 +97,7 @@ export function CreateGameForm() {
               type="text"
               name="title"
               placeholder="e.g., Friday Night Basketball"
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
           </div>
@@ -105,7 +107,7 @@ export function CreateGameForm() {
             <label className="label">
               <span className="label-text">Sport Type *</span>
             </label>
-            <select name="sport_type" className="select select-bordered w-full" required>
+            <select name="sport_type" className="select w-full rounded-md" required>
               <option value="">Select a sport</option>
               {SPORT_TYPES.map((sport) => (
                 <option key={sport} value={sport}>
@@ -125,7 +127,7 @@ export function CreateGameForm() {
               type="text"
               name="location"
               placeholder="e.g., Central Park Courts"
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
           </div>
@@ -137,7 +139,7 @@ export function CreateGameForm() {
               <label className="label">
                 <span className="label-text">Date *</span>
               </label>
-              <input type="date" name="date" className="input input-bordered w-full" required />
+              <input type="date" name="date" className="input w-full rounded-md" required />
             </div>
 
             {/* Time */}
@@ -145,7 +147,7 @@ export function CreateGameForm() {
               <label className="label">
                 <span className="label-text">Time *</span>
               </label>
-              <input type="time" name="time" className="input input-bordered w-full" required />
+              <input type="time" name="time" className="input w-full rounded-md" required />
             </div>
           </div>
 
@@ -159,7 +161,7 @@ export function CreateGameForm() {
               name="max_capacity"
               placeholder="e.g., 10"
               min="2"
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
               required
             />
             <label className="label">
@@ -175,7 +177,7 @@ export function CreateGameForm() {
             <textarea
               name="description"
               placeholder="Add any additional details about the game..."
-              className="textarea textarea-bordered h-24"
+              className="textarea h-24 rounded-md"
               rows={4}
             />
           </div>

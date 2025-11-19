@@ -5,7 +5,7 @@ import { formatLongDate } from "@/utils/format-date"
 import { api } from "@/services/api"
 
 interface User {
-  id: number
+  id: string
   name: string
   email: string
   created_at: string
@@ -23,7 +23,7 @@ export default function UserProfilePage() {
 
       try {
         setLoading(true)
-        const userData = await api.getUser(Number(userId))
+        const userData = await api.getUser(userId)
         setUser(userData)
         setError(null)
       } catch {

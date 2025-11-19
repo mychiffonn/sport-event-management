@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react"
+import { CheckCircle, HelpCircle, XCircle } from "lucide-react"
 
 import type { RSVP } from "@server/types"
 
@@ -78,19 +78,19 @@ export default function AttendeeList({ rsvps }: AttendeeListProps) {
           <div className="flex flex-wrap gap-2">
             {goingRsvps.length > 0 && (
               <div className="badge badge-success gap-1">
-                <Icon icon="lucide:check-circle" className="text-sm" />
+                <CheckCircle className="w-4" />
                 Going: {goingRsvps.length}
               </div>
             )}
             {maybeRsvps.length > 0 && (
               <div className="badge badge-warning gap-1">
-                <Icon icon="lucide:help-circle" className="text-sm" />
+                <HelpCircle className="w-4" />
                 Maybe: {maybeRsvps.length}
               </div>
             )}
             {notGoingRsvps.length > 0 && (
               <div className="badge badge-error gap-1">
-                <Icon icon="lucide:x-circle" className="text-sm" />
+                <XCircle className="w-4" />
                 Not Going: {notGoingRsvps.length}
               </div>
             )}

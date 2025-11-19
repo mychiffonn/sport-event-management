@@ -1,13 +1,14 @@
-import { Icon } from "@iconify/react"
+import { AlertCircle, CheckCircle, Clock, HelpCircle, Trash2, XCircle } from "lucide-react"
 import { useState } from "react"
 
 import type { RSVP, RSVPStatus } from "@server/types"
 
 interface RSVPButtonProps {
   gameId: number
-  userId: number
+  userId: string
   currentRsvp: RSVP | undefined
   isFull: boolean
+  isPast: boolean
   onRsvpChange: (rsvp: RSVP | null) => void
   onCapacityChange: (delta: number) => void
 }
@@ -17,6 +18,7 @@ export default function RSVPButton({
   userId,
   currentRsvp,
   isFull,
+  isPast,
   onRsvpChange,
   onCapacityChange
 }: RSVPButtonProps) {
@@ -120,9 +122,8 @@ export default function RSVPButton({
           onCapacityChange(1) // Increment capacity for "going"
         }
       } catch (err) {
-        console.error("Error creating RSVP:", err)
         const errorMessage = err instanceof Error ? err.message : "Failed to RSVP"
-        console.error("Full error details:", { gameId, userId, error: err })
+        console.error("Failed to RSVP:", { gameId, userId, error: err })
         alert(`Failed to RSVP: ${errorMessage}`)
       } finally {
         setLoading(false)
@@ -136,71 +137,78 @@ export default function RSVPButton({
   // Always show three status buttons
   return (
     <div className="flex flex-col gap-3">
-      {isFull && !currentRsvp && (
+      {isPast && (
+        <div className="alert alert-info">
+          <Clock className="text-lg" />
+          <span className="text-sm">This event has already passed</span>
+        </div>
+      )}
+
+      {isFull && !currentRsvp && !isPast && (
         <div className="alert alert-warning">
-          <Icon icon="lucide:alert-circle" className="text-lg" />
+          <AlertCircle className="text-lg" />
           <span className="text-sm">This game is full</span>
         </div>
       )}
 
       <div className="flex flex-col gap-2">
         {/* Going Button */}
-        <div className="tooltip" data-tip="I'll be there!">
+        <div className="tooltip" data-tip={isPast ? "Event has passed" : "I'll be there!"}>
           <button
             className={`btn w-full justify-start ${currentStatus === "going" ? "btn-success" : "btn-outline btn-success"}`}
             onClick={() => handleStatusClick("going")}
-            disabled={isLoading("going") || (currentStatus !== "going" && isFull)}
+            disabled={isLoading("going") || isPast || (currentStatus !== "going" && isFull)}
           >
             {isLoading("going") ? (
               <span className="loading loading-spinner loading-sm"></span>
             ) : (
-              <Icon icon="lucide:check-circle" className="text-xl" />
+              <CheckCircle className="text-xl" />
             )}
             <span>Going</span>
           </button>
         </div>
 
         {/* Maybe Button */}
-        <div className="tooltip" data-tip="I might come">
+        <div className="tooltip" data-tip={isPast ? "Event has passed" : "I might come"}>
           <button
             className={`btn w-full justify-start ${currentStatus === "maybe" ? "btn-warning" : "btn-outline btn-warning"}`}
             onClick={() => handleStatusClick("maybe")}
-            disabled={isLoading("maybe")}
+            disabled={isLoading("maybe") || isPast}
           >
             {isLoading("maybe") ? (
               <span className="loading loading-spinner loading-sm"></span>
             ) : (
-              <Icon icon="lucide:help-circle" className="text-xl" />
+              <HelpCircle className="text-xl" />
             )}
             <span>Maybe</span>
           </button>
         </div>
 
         {/* Not Going Button */}
-        <div className="tooltip" data-tip="Can't make it">
+        <div className="tooltip" data-tip={isPast ? "Event has passed" : "Can't make it"}>
           <button
             className={`btn w-full justify-start ${currentStatus === "not_going" ? "btn-error" : "btn-outline btn-error"}`}
             onClick={() => handleStatusClick("not_going")}
-            disabled={isLoading("not_going")}
+            disabled={isLoading("not_going") || isPast}
           >
             {isLoading("not_going") ? (
               <span className="loading loading-spinner loading-sm"></span>
             ) : (
-              <Icon icon="lucide:x-circle" className="text-xl" />
+              <XCircle className="text-xl" />
             )}
             <span>Not Going</span>
           </button>
         </div>
       </div>
 
-      {/* Remove RSVP link - only show if user has RSVP'd */}
-      {currentRsvp && (
+      {/* Remove RSVP link - only show if user has RSVP'd and event hasn't passed */}
+      {currentRsvp && !isPast && (
         <button
           className="btn btn-ghost btn-sm btn-block"
           onClick={handleCancelRSVP}
           disabled={loading}
         >
-          <Icon icon="lucide:trash-2" className="text-lg" />
+          <Trash2 className="text-lg" />
           Remove RSVP
         </button>
       )}

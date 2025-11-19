@@ -153,7 +153,6 @@ sport-connect/
   │   │   │   ├── rsvps/          # RSVPButton, RSVPList
   │   │   │   └── common/         # Navbar, Footer, etc.
   │   │   ├── pages/              # Home, GameDetail, Profile, etc.
-  │   │   ├── hooks/              # useAuth, useGames, etc.
   │   │   ├── services/
   │   │   │   └── api.ts          # Axios/fetch wrapper
   │   │   ├── lib/
@@ -177,13 +176,8 @@ sport-connect/
   │   │   ├── pool.ts
   │   │   ├── schema.sql
   │   │   └── seed.sql
-  │   ├── types.ts                # Endpoint types (e.g., game, rsvp)
+  │   ├── types.d.ts                # Endpoint types (e.g., game, rsvp)
   │   └── server.ts
-  ├── shared/                     # Shared between client/server
-  │   └── types/
-  │       ├── user.ts
-  │       ├── game.ts
-  │       └── rsvp.ts
   └── package.json
 ```
 
@@ -195,7 +189,7 @@ sport-connect/
 
 ### Frontend
 
-![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.17-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![DaisyUI](https://img.shields.io/badge/DaisyUI-5.5.0-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-7.2.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.17-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![DaisyUI](https://img.shields.io/badge/DaisyUI-5.5.5-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-7.2.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
 ### Backend
 

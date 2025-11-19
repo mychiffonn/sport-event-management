@@ -101,7 +101,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
   }
 
   return (
-    <div className="card bg-base-200 mb-6 shadow-lg">
+    <div className="card bg-base-200 mb-6 shadow-md">
       <div className="card-body">
         <h3 className="card-title text-lg">Search & Filter Games</h3>
 
@@ -117,7 +117,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               placeholder="Search by title, description, or location..."
-              className="input input-bordered w-full"
+              className="input w-full rounded-md"
             />
           </div>
 
@@ -128,7 +128,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
             </label>
             <select
               name="sort"
-              className="select select-bordered w-full"
+              className="select w-full rounded-md"
               value={filters.sortValue}
               onChange={(e) => setFilters({ ...filters, sortValue: e.target.value })}
             >
@@ -150,7 +150,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
               </label>
               <select
                 name="sport_type"
-                className="select select-bordered w-full"
+                className="select w-full rounded-md"
                 value={filters.sportType}
                 onChange={(e) => setFilters({ ...filters, sportType: e.target.value })}
               >
@@ -174,7 +174,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
                 value={filters.location}
                 onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                 placeholder="Filter by city..."
-                className="input input-bordered w-full"
+                className="input w-full rounded-md"
               />
             </div>
 
@@ -189,7 +189,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
                 value={filters.dateStart}
                 onChange={(e) => setFilters({ ...filters, dateStart: e.target.value })}
                 max={filters.dateEnd || undefined}
-                className="input input-bordered w-full"
+                className="input w-full rounded-md"
               />
             </div>
 
@@ -203,7 +203,7 @@ function FilterBar({ onFilterChange, initialFilters = {} }: FilterBarProps) {
                 value={filters.dateEnd}
                 onChange={(e) => setFilters({ ...filters, dateEnd: e.target.value })}
                 min={filters.dateStart || undefined}
-                className="input input-bordered w-full"
+                className="input w-full rounded-md"
               />
             </div>
 

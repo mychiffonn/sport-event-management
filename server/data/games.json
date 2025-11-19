@@ -1,52 +1,72 @@
 [
   {
-    "organizer_id": 1,
-    "title": "Morning Basketball Game",
+    "organizer_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
+    "title": "Past Basketball Game",
     "sport_type": "Basketball",
-    "location": "Central Park Courts",
-    "scheduled_at": "2025-12-15T10:00:00",
+    "location": "Central Park Courts, NYC",
+    "scheduled_at": "2025-11-10T10:00:00",
     "timezone": "America/New_York",
     "max_capacity": 10,
-    "description": "Casual basketball game, all skill levels welcome!"
+    "description": "This game already happened - casual basketball, all skill levels."
   },
   {
-    "organizer_id": 2,
+    "organizer_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
     "title": "Weekend Soccer Match",
     "sport_type": "Soccer",
-    "location": "Riverside Field",
-    "scheduled_at": "2025-12-20T09:00:00",
+    "location": "Riverside Field, LA",
+    "scheduled_at": "2025-11-20T09:00:00",
     "timezone": "America/Los_Angeles",
     "max_capacity": 22,
-    "description": "Friendly soccer match, need more players!"
+    "description": "Friendly soccer match this weekend, need more players!"
   },
   {
-    "organizer_id": 3,
-    "title": "Doubles Tennis Session",
+    "organizer_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
+    "title": "Intimate Tennis Doubles",
     "sport_type": "Tennis",
-    "location": "City Tennis Center",
-    "scheduled_at": "2025-12-18T14:00:00",
+    "location": "City Tennis Center, Chicago",
+    "scheduled_at": "2025-11-22T14:00:00",
     "timezone": "America/Chicago",
-    "max_capacity": 4,
-    "description": "Looking for doubles partners, intermediate level"
+    "max_capacity": 3,
+    "description": "Small group tennis session - FULL! Only 3 spots available."
   },
   {
-    "organizer_id": 4,
-    "title": "Sunset Beach Volleyball",
+    "organizer_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
+    "title": "Thanksgiving Volleyball",
     "sport_type": "Volleyball",
-    "location": "Beach Court",
-    "scheduled_at": "2025-12-22T18:00:00",
-    "timezone": "America/Denver",
+    "location": "Santa Monica Beach, CA",
+    "scheduled_at": "2025-11-25T15:00:00",
+    "timezone": "America/Los_Angeles",
     "max_capacity": 12,
-    "description": "Beach volleyball at sunset, bring your energy!"
+    "description": "Beach volleyball on Thanksgiving week, bring your friends!"
   },
   {
-    "organizer_id": 5,
-    "title": "Badminton Tournament",
+    "organizer_id": "h0BDvFeRh4rSI0Ua6gB7NRfnan9wJDET",
+    "title": "Early Morning Badminton",
     "sport_type": "Badminton",
-    "location": "Sports Complex",
-    "scheduled_at": "2025-12-25T11:00:00",
+    "location": "Denver Sports Complex",
+    "scheduled_at": "2025-12-01T07:00:00",
+    "timezone": "America/Denver",
+    "max_capacity": 8,
+    "description": "Early morning badminton for early birds!"
+  },
+  {
+    "organizer_id": "zh85MVVJkoTlW1Mxjw8Vrf7FSVf1xnsz",
+    "title": "Past Friday Night Game",
+    "sport_type": "Basketball",
+    "location": "Brooklyn Recreation Center",
+    "scheduled_at": "2025-11-15T19:00:00",
     "timezone": "America/New_York",
     "max_capacity": 16,
-    "description": "Singles and doubles tournament, prizes for winners!"
+    "description": "This Friday night game is over - was a great turnout!"
+  },
+  {
+    "organizer_id": "7pEY83Vz5s185IVVSrT1hqsd96LBfgt4",
+    "title": "Holiday Soccer Tournament",
+    "sport_type": "Soccer",
+    "location": "Miami Beach Park",
+    "scheduled_at": "2025-12-20T10:00:00",
+    "timezone": "America/New_York",
+    "max_capacity": 20,
+    "description": "Holiday tournament - competitive players welcome!"
   }
 ]
