@@ -30,7 +30,7 @@ CREATE TABLE games (
     date DATE NOT NULL,
     time TIME NOT NULL,
     capacity INTEGER NOT NULL CHECK (capacity >= 2),
-    description TEXT NOT NULL,
+    description VARCHAR(1000),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE,
