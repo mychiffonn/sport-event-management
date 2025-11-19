@@ -13,8 +13,13 @@ const getTrustedOrigins = (): string[] => {
   return origins
 }
 
+const getBaseURL = (): string => {
+  const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:3000"
+  return baseURL
+}
+
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: getBaseURL(),
   database: new Pool({
     connectionString,
     ssl: process.env.PGHOST?.includes("render.com") ? { rejectUnauthorized: false } : undefined
