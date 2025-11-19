@@ -59,7 +59,7 @@ Complete the checklist below detailing each baseline, custom, and stretch featur
 - [x] The user can filter or sort items based on particular criteria as appropriate for your use case
 - [ ] Data is automatically generated in response to a certain event or user action. Examples include generating a default inventory for a new user starting a game or creating a starter set of tasks for a user creating a new task app account
 - [x] Data submitted via a POST or PATCH request is validated before the database is updated (e.g. validating that an event is in the future before allowing a new event to be created)
-  - [ ] _To receive full credit, please be sure to demonstrate in your walkthrough that for certain inputs, the item will NOT be successfully created or updated._
+  - [x] _To receive full credit, please be sure to demonstrate in your walkthrough that for certain inputs, the item will NOT be successfully created or updated._
 
 ### Stretch Features
 
@@ -86,20 +86,20 @@ Complete the checklist below detailing each baseline, custom, and stretch featur
 
 ### 1. What went well during this unit?
 
-[We worked together as a team to tackle bugs efficiently.]
+We worked together as a team to tackle bugs efficiently. We also had a good time working together and were able to divide work effectively. We were able to deploy our project on Render and have it working as intended.
 
 ### 2. What were some challenges your group faced in this unit?
 
-[Deploying the website was a bit of a hassle, and it took a bit to sync with our latest pushes.]
+Deploying the website was a bit of a hassle, and it took a bit to sync with our latest pushes.
 
 ### 3. What were some of the highlights or achievements that you are most proud of in this project?
 
-[Having a full-stack application created through team effort was the most enjoyable part. Seeing an idea come to fruition as a group made the entire process worth it.
+Having a full-stack application created through team effort was the most enjoyable part. Seeing an idea come to fruition as a group made the entire process worth it.
 
 ### 4. Reflecting on your web development journey so far, how have you grown since the beginning of the course?
 
-[We've gained new insights on developing and deploying full-stack applications, along with experience handling GitHub workflows in a team environment.]
+We've gained new insights on developing and deploying full-stack applications, along with experience handling GitHub workflows in a team environment.
 
 ### 5. Looking ahead, what are your goals related to web development, and what steps do you plan to take to achieve them?
 
-[Learning how to manage and look for different bugs before and after deployment. In the future, it'd be better to break up projects into smaller steps for testing.]
+Learning how to manage and look for different bugs before and after deployment. In the future, it'd be better to break up projects into smaller steps for testing.
