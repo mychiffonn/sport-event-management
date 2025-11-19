@@ -1,6 +1,14 @@
 import type { Game, RSVP } from "@server/types"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  return import.meta.env.MODE === "production" ? "/api" : "http://localhost:3000/api"
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 export const api = {
   // get all games
