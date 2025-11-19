@@ -60,7 +60,7 @@ function MyGamesPage() {
       <div className="mb-8">
         <h1 className="mb-2 text-4xl font-bold">Your Dashboard</h1>
         <p className="mb-4 text-lg opacity-70">Manage your games and see what's coming up</p>
-        <Link to="/games" className="btn btn-primary">
+        <Link to="/" className="btn btn-primary">
           Browse All Games
         </Link>
       </div>
@@ -93,7 +93,7 @@ function MyGamesPage() {
           <div className="alert alert-info">
             <span>
               You haven't RSVP'd to any upcoming games.{" "}
-              <Link to="/games" className="link">
+              <Link to="/" className="link">
                 Find a game to join!
               </Link>
             </span>

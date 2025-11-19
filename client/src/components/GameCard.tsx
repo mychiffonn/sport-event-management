@@ -5,7 +5,7 @@ import FormattedDatetime from "@/components/FormattedDatetime"
 
 interface GameCardProps {
   game: Game
-  currentUserId?: number
+  currentUserId?: string
 }
 
 function GameCard({ game, currentUserId }: GameCardProps) {

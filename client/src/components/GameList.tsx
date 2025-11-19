@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 import { api, type Game } from "../services/api"
 import FilterBar from "./FilterBar"
@@ -10,6 +11,8 @@ export function GameList() {
   const [games, setGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth()
+  const currentUserId = user?.id
 
   const [filters, setFilters] = useState<{
     sport_type?: string
@@ -120,7 +123,7 @@ export function GameList() {
         /* Games grid */
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {games.map((game) => (
-            <GameCard key={game.id} game={game} currentUserId={1} />
+            <GameCard key={game.id} game={game} currentUserId={currentUserId} />
           ))}
         </div>
       )}
