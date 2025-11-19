@@ -1,10 +1,11 @@
-import { AlertCircle, CheckCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Info } from "lucide-react"
 import { useState } from "react"
-import { useAuth } from "@/contexts/AuthContext"
+import { hasPasswordAuth, useAuth } from "@/contexts/AuthContext"
 import { authClient } from "@/utils/auth-client"
 
 export default function ProfilePage() {
   const { user } = useAuth()
+  const canChangePassword = hasPasswordAuth(user)
   const [name, setName] = useState(user?.name || "")
   const [email, setEmail] = useState(user?.email || "")
   const [currentPassword, setCurrentPassword] = useState("")
@@ -26,13 +27,17 @@ export default function ProfilePage() {
         await authClient.updateUser({ name, image: user?.image })
       }
 
-      // Update email if changed
-      if (email !== user?.email) {
+      // Update email if changed (only for email/password users)
+      if (email !== user?.email && canChangePassword) {
         await authClient.changeEmail({ newEmail: email })
+      } else if (email !== user?.email && !canChangePassword) {
+        setError("Cannot change email for social login accounts")
+        setLoading(false)
+        return
       }
 
-      // Update password if provided
-      if (newPassword) {
+      // Update password if provided (only for email/password users)
+      if (newPassword && canChangePassword) {
         if (newPassword !== confirmPassword) {
           setError("Passwords do not match")
           setLoading(false)
@@ -51,6 +56,10 @@ export default function ProfilePage() {
         setCurrentPassword("")
         setNewPassword("")
         setConfirmPassword("")
+      } else if (newPassword && !canChangePassword) {
+        setError("Cannot change password for social login accounts")
+        setLoading(false)
+        return
       }
 
       setSuccess("Profile updated successfully!")
@@ -110,60 +119,78 @@ export default function ProfilePage() {
                 className="input w-full rounded-md"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={!canChangePassword}
                 required
               />
-            </div>
-
-            <div className="divider">Change Password (Optional)</div>
-
-            {/* Current Password */}
-            <div className="space-y-2">
-              <label htmlFor="currentPassword" className="text-sm font-medium">
-                Current Password
-              </label>
-              <input
-                id="currentPassword"
-                type="password"
-                placeholder="Required if changing password"
-                className="input w-full rounded-md"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
-            </div>
-
-            {/* New Password */}
-            <div className="space-y-2">
-              <label htmlFor="newPassword" className="text-sm font-medium">
-                New Password
-              </label>
-              <input
-                id="newPassword"
-                type="password"
-                placeholder="Leave blank to keep current"
-                className="input w-full rounded-md"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                minLength={8}
-              />
-              {newPassword && (
-                <p className="text-base-content/60 text-xs">Must be at least 8 characters</p>
+              {!canChangePassword && (
+                <p className="text-base-content/60 text-xs">
+                  Email is managed by your social provider
+                </p>
               )}
             </div>
 
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                className="input w-full rounded-md"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
+            {canChangePassword ? (
+              <>
+                <div className="divider">Change Password (Optional)</div>
+
+                {/* Current Password */}
+                <div className="space-y-2">
+                  <label htmlFor="currentPassword" className="text-sm font-medium">
+                    Current Password
+                  </label>
+                  <input
+                    id="currentPassword"
+                    type="password"
+                    placeholder="Required if changing password"
+                    className="input w-full rounded-md"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </div>
+
+                {/* New Password */}
+                <div className="space-y-2">
+                  <label htmlFor="newPassword" className="text-sm font-medium">
+                    New Password
+                  </label>
+                  <input
+                    id="newPassword"
+                    type="password"
+                    placeholder="Leave blank to keep current"
+                    className="input w-full rounded-md"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    minLength={8}
+                  />
+                  {newPassword && (
+                    <p className="text-base-content/60 text-xs">Must be at least 8 characters</p>
+                  )}
+                </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Confirm New Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm new password"
+                    className="input w-full rounded-md"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="alert alert-info">
+                <Info className="h-6 w-6 shrink-0" />
+                <span>
+                  You signed in with a social provider (GitHub/Google). Email and password
+                  management are handled by your provider.
+                </span>
+              </div>
+            )}
 
             {/* Submit Button */}
             <div className="pt-4">

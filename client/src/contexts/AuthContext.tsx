@@ -1,6 +1,12 @@
 import { createContext, useContext, type ReactNode } from "react"
 import { authClient } from "@/utils/auth-client"
 
+interface Account {
+  id: string
+  provider: string
+  providerId: string
+}
+
 interface User {
   id: string
   name: string
@@ -9,6 +15,7 @@ interface User {
   image?: string
   createdAt: Date
   updatedAt: Date
+  accounts?: Account[]
 }
 
 interface Session {
@@ -47,4 +54,15 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
+}
+
+// Helper function to check if user has email/password authentication
+export function hasPasswordAuth(user: User | null): boolean {
+  if (!user?.accounts || user.accounts.length === 0) {
+    // If no accounts info, assume email/password (backward compatibility)
+    return true
+  }
+
+  // Check if user has credential (email/password) account
+  return user.accounts.some((account) => account.provider === "credential")
 }
