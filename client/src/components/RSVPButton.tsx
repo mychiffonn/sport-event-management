@@ -96,14 +96,39 @@ export default function RSVPButton({
     }
   }
 
-  // Determine which status is currently active (null if no RSVP)
   const currentStatus = currentRsvp?.status || null
   const isLoading = (status: RSVPStatus | null) => loading && currentStatus === status
+
+  const isButtonDisabled = (status: RSVPStatus) => {
+    return isLoading(status) || isPast || (isFull && currentStatus !== "going")
+  }
+
+  const getTooltipText = (status: RSVPStatus) => {
+    if (isPast) return "Event has passed"
+    if (isFull && currentStatus !== "going") return "Game is full"
+
+    const tooltips: Record<RSVPStatus, string> = {
+      going: "I'll be there!",
+      maybe: "I might come",
+      not_going: "Can't make it"
+    }
+    return tooltips[status]
+  }
+
+  const buttonConfigs: Array<{
+    status: RSVPStatus
+    label: string
+    icon: typeof CheckCircle
+    className: string
+  }> = [
+    { status: "going", label: "Going", icon: CheckCircle, className: "btn-success" },
+    { status: "maybe", label: "Maybe", icon: HelpCircle, className: "btn-warning" },
+    { status: "not_going", label: "Not Going", icon: XCircle, className: "btn-error" }
+  ]
 
   // Handler for button clicks
   const handleStatusClick = async (status: RSVPStatus) => {
     if (!currentRsvp) {
-      // Create new RSVP with the selected status
       setLoading(true)
       try {
         const { api } = await import("@/services/api")
@@ -129,12 +154,10 @@ export default function RSVPButton({
         setLoading(false)
       }
     } else {
-      // Update existing RSVP
       await handleUpdateRSVP(status)
     }
   }
 
-  // Always show three status buttons
   return (
     <div className="flex flex-col gap-3">
       {isPast && (
@@ -152,53 +175,27 @@ export default function RSVPButton({
       )}
 
       <div className="flex flex-col gap-2">
-        {/* Going Button */}
-        <div className="tooltip" data-tip={isPast ? "Event has passed" : "I'll be there!"}>
-          <button
-            className={`btn w-full justify-start ${currentStatus === "going" ? "btn-success" : "btn-outline btn-success"}`}
-            onClick={() => handleStatusClick("going")}
-            disabled={isLoading("going") || isPast || (currentStatus !== "going" && isFull)}
-          >
-            {isLoading("going") ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              <CheckCircle className="text-xl" />
-            )}
-            <span>Going</span>
-          </button>
-        </div>
+        {buttonConfigs.map(({ status, label, icon: Icon, className }) => {
+          const isActive = currentStatus === status
+          const disabled = isButtonDisabled(status)
 
-        {/* Maybe Button */}
-        <div className="tooltip" data-tip={isPast ? "Event has passed" : "I might come"}>
-          <button
-            className={`btn w-full justify-start ${currentStatus === "maybe" ? "btn-warning" : "btn-outline btn-warning"}`}
-            onClick={() => handleStatusClick("maybe")}
-            disabled={isLoading("maybe") || isPast}
-          >
-            {isLoading("maybe") ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              <HelpCircle className="text-xl" />
-            )}
-            <span>Maybe</span>
-          </button>
-        </div>
-
-        {/* Not Going Button */}
-        <div className="tooltip" data-tip={isPast ? "Event has passed" : "Can't make it"}>
-          <button
-            className={`btn w-full justify-start ${currentStatus === "not_going" ? "btn-error" : "btn-outline btn-error"}`}
-            onClick={() => handleStatusClick("not_going")}
-            disabled={isLoading("not_going") || isPast}
-          >
-            {isLoading("not_going") ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              <XCircle className="text-xl" />
-            )}
-            <span>Not Going</span>
-          </button>
-        </div>
+          return (
+            <div key={status} className="tooltip" data-tip={getTooltipText(status)}>
+              <button
+                className={`btn w-full justify-start ${isActive ? className : `btn-outline ${className}`}`}
+                onClick={() => handleStatusClick(status)}
+                disabled={disabled}
+              >
+                {isLoading(status) ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <Icon className="text-xl" />
+                )}
+                <span>{label}</span>
+              </button>
+            </div>
+          )
+        })}
       </div>
 
       {/* Remove RSVP link - only show if user has RSVP'd and event hasn't passed */}
