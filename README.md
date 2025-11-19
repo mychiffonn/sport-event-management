@@ -92,7 +92,7 @@ Users can delete an event or undo their RSVP to an event
 
 Users cannot RSVP to a game if
 
-- the number of attendees has reached the maximum capacity. RSVP buttons are disabled
+- the number of attendees has reached the maximum capacity, UNLESS they RSVPed as "Going" before the game reached capacity. In this case, they can change their RSVP status freely, but they cannot change it to "Going" if the game is already full.
 - the game date has already passed. RSVP buttons are disabled
 - they have already RSVP'd to the game
 - they are the host of the game

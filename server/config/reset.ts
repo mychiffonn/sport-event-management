@@ -69,6 +69,30 @@ const createTablesQuery = `
 
   CREATE TRIGGER update_rsvps_updated_at BEFORE UPDATE ON rsvps
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+  -- Trigger to prevent organizers from RSVPing to their own games
+  CREATE OR REPLACE FUNCTION prevent_organizer_rsvp()
+  RETURNS TRIGGER AS $$
+  DECLARE
+      game_organizer_id VARCHAR(255);
+  BEGIN
+      -- Get the organizer_id for the game
+      SELECT organizer_id INTO game_organizer_id
+      FROM games
+      WHERE id = NEW.game_id;
+
+      -- Check if the user trying to RSVP is the organizer
+      IF game_organizer_id = NEW.user_id THEN
+          RAISE EXCEPTION 'Organizers cannot RSVP to their own games';
+      END IF;
+
+      RETURN NEW;
+  END;
+  $$ language 'plpgsql';
+
+  CREATE TRIGGER prevent_organizer_rsvp_trigger
+      BEFORE INSERT OR UPDATE ON rsvps
+      FOR EACH ROW EXECUTE FUNCTION prevent_organizer_rsvp();
 `
 
 async function loadSeedData() {

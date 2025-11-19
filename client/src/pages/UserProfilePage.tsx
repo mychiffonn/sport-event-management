@@ -66,6 +66,7 @@ export default function UserProfilePage() {
           <div>
             <h1 className="card-title text-3xl">{user.name}</h1>
             <p className="text-base-content/70">{user.email}</p>
+            <p className="text-base-content/60 text-sm">ID: {user.id}</p>
             <div>
               <span className="font-semibold">Member since: </span>
               <span>{formatLongDate(user.created_at)}</span>

@@ -90,6 +90,9 @@ export default function ProfilePage() {
 
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
+          <p className="text-base-content/60 text-sm">
+            <span className="font-medium">User ID:</span> {user?.id}
+          </p>
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div className="space-y-2">
